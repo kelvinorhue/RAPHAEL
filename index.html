@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Ralph's Remove BG</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#6a0dad" />
+  <style>
+    :root {
+      --white: #ffffff;
+      --black: #000000;
+      --gold: #d4af37;
+      --purple: #6a0dad;
+      --blue: #0d6efd;
+      --bg: #0b0b12;
+      --text: #111114;
+      --muted: #6b6f76;
+      --card: #101420;
+      --card-2: #121624;
+      --ring: #2b2f3f;
+      --success: #2ecc71;
+      --danger: #e74c3c;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 600px at 85% -50%, rgba(13, 110, 253, 0.12), rgba(13, 110, 253, 0) 60%),
+        radial-gradient(900px 500px at -20% 0%, rgba(106, 13, 173, 0.18), rgba(106, 13, 173, 0) 60%),
+        linear-gradient(180deg, #0c0f17 0%, #0b0e15 100%);
+      color: var(--white);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: saturate(1.2) blur(12px);
+      background: rgba(10, 12, 18, 0.55);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+    }
+
+    .nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--white);
+    }
+
+    .logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background:
+        conic-gradient(from 210deg, var(--gold), var(--purple), var(--blue), var(--gold));
+      box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.35), 0 0 30px rgba(106, 13, 173, 0.35);
+      border: 2px solid rgba(212, 175, 55, 0.6);
+    }
+
+    .title {
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      font-size: 1.1rem;
+    }
+
+    .title small {
+      display: block;
+      font-weight: 500;
+      color: #c9c6ff;
+      opacity: 0.9;
+      font-size: 0.78rem;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 28px auto;
+      padding: 0 20px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 24px;
+    }
+
+    @media (max-width:960px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: linear-gradient(180deg, var(--card) 0%, var(--card-2) 100%);
+      border: 1px solid var(--ring);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .panel h2 {
+      margin: 0 0 8px 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #e9e9ff;
+    }
+
+    .panel p {
+      margin: 0 0 14px 0;
+      color: #cfd3e3;
+      font-size: 0.95rem;
+    }
+
+    .uploader {
+      border: 2px dashed rgba(212, 175, 55, 0.45);
+      border-radius: 16px;
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+      align-items: center;
+      justify-items: center;
+      background: rgba(13, 110, 253, 0.06);
+    }
+
+    .uploader.drag {
+      border-color: var(--blue);
+      background: rgba(13, 110, 253, 0.12);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(212, 175, 55, 0.42);
+      color: var(--white);
+      background: linear-gradient(180deg, #1a1f33 0%, #13182a 100%);
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(13, 110, 253, 0.25);
+    }
+
+    .btn.primary {
+      background: linear-gradient(180deg, #6a0dad 0%, #4d097f 100%);
+      border-color: rgba(212, 175, 55, 0.55);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      border-color: rgba(106, 13, 173, 0.5);
+    }
+
+    .btn[disabled] {
+      opacity: .6;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    @media (max-width:560px) {
+      .controls {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .ctrl {
+      background: #0e1322;
+      border: 1px solid #262a3b;
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .ctrl label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      color: #f2e9ff;
+    }
+
+    .ctrl .row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ctrl input[type="range"] {
+      width: 100%;
+    }
+
+    .ctrl input[type="color"] {
+      width: 42px;
+      height: 32px;
+      border: 1px solid #3a3f55;
+      border-radius: 8px;
+      background: #10162b;
+      padding: 0;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .radio {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid #303651;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #0f1426;
+    }
+
+    .radio input {
+      accent-color: var(--purple);
+    }
+
+    .preview {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      align-items: center;
+      justify-items: center;
+      min-height: 280px;
+      border-radius: 16px;
+      padding: 10px;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.11), rgba(13, 110, 253, 0.12));
+      border: 1px dashed rgba(106, 13, 173, 0.45);
+    }
+
+    canvas {
+      max-width: 100%;
+      border-radius: 10px;
+      background: transparent;
+    }
+
+    .checker {
+      --size: 16px;
+      background:
+        linear-gradient(45deg, #f7f7ff 25%, transparent 25%) 0 0/var(--size) var(--size),
+        linear-gradient(45deg, transparent 75%, #f7f7ff 75%) 0 0/var(--size) var(--size),
+        linear-gradient(45deg, #dfe2f0 25%, transparent 25%) var(--size) var(--size)/var(--size) var(--size),
+        linear-gradient(45deg, transparent 75%, #dfe2f0 75%) var(--size) var(--size)/var(--size) var(--size),
+        linear-gradient(0deg, transparent, transparent);
+      border-radius: 12px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width:700px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .footer {
+      margin-top: 30px;
+      padding: 20px;
+      border-top: 1px solid rgba(212, 175, 55, 0.25);
+      background: rgba(10, 12, 18, 0.5);
+    }
+
+    .footer .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      gap: 6px;
+      color: #d9dded;
+    }
+
+    .credits {
+      font-size: 0.9rem;
+      color: #c9cfe2;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      color: #ffe9a8;
+      background: linear-gradient(180deg, rgba(212, 175, 55, 0.16), rgba(212, 175, 55, 0.08));
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+
+    .note {
+      color: #bfc4d6;
+      font-size: 0.9rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(13, 110, 253, 0.45);
+      color: #bfe0ff;
+      background: linear-gradient(180deg, rgba(13, 110, 253, 0.18), rgba(13, 110, 253, 0.08));
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="nav">
+      <a class="brand" href="#">
+        <span class="logo" aria-hidden="true"></span>
+        <div class="title">
+          Ralph's Remove BG
+          <small>Fast, simple background removal right in your browser</small>
+        </div>
+      </a>
+      <div class="pill">Colors: White • Gold • Purple • Black • Blue</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="panel">
+        <h2>Upload image</h2>
+        <p>Drop an image or pick a file. Click the background to sample a color, or use Auto for common flat
+          backgrounds.</p>
+
+        <div id="drop" class="uploader" tabindex="0">
+          <div style="text-align:center">
+            <div style="font-size:0.95rem; margin-bottom:8px;">
+              <strong>Drag & drop</strong> your image here
+            </div>
+            <button class="btn primary" id="pickBtn">
+              📁 Choose image
+            </button>
+            <input id="file" type="file" accept="image/*" class="hidden" />
+            <div class="note" style="margin-top:8px;">PNG recommended for best edges. Max ~12MB for smooth performance.
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="ctrl">
+            <label>Removal mode</label>
+            <div class="radio-group">
+              <label class="radio"><input type="radio" name="mode" value="auto" checked /> Auto (sample corners)</label>
+              <label class="radio"><input type="radio" name="mode" value="eyedrop" /> Eyedropper (click canvas)</label>
+              <label class="radio"><input type="radio" name="mode" value="color" /> Pick color</label>
+            </div>
+            <div class="row" style="margin-top:10px;">
+              <input type="color" id="colorPick" value="#ffffff" />
+              <button class="btn ghost" id="sampleBtn">Sample corners now</button>
+            </div>
+          </div>
+
+          <div class="ctrl">
+            <label>Tolerance</label>
+            <div class="row">
+              <input type="range" id="tol" min="0" max="255" value="40" />
+              <span id="tolVal" class="badge">40</span>
+            </div>
+            <div style="margin-top:8px; color:#bfc4d6; font-size:0.85rem;">
+              Higher tolerance removes more shades near the selected color.
+            </div>
+          </div>
+
+          <div class="ctrl">
+            <label>Feather (soft edges)</label>
+            <div class="row">
+              <input type="range" id="feather" min="0" max="10" value="2" />
+              <span id="featherVal" class="badge">2 px</span>
+            </div>
+          </div>
+
+          <div class="ctrl">
+            <label>Cleanup</label>
+            <div class="row">
+              <button class="btn" id="invertBtn">Invert selection</button>
+              <button class="btn" id="resetBtn">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:12px;">
+          <button class="btn primary" id="processBtn">Remove background</button>
+          <button class="btn" id="downloadBtn" disabled>Download PNG</button>
+        </div>
+
+        <div style="margin-top:10px;">
+          <span class="pill">Tip: In Eyedropper mode, click the canvas to set the background color.</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Preview</h2>
+        <p>Left: original. Right: background removed with transparency (checkerboard).</p>
+        <div class="preview">
+          <div class="grid-2" style="width:100%;">
+            <div>
+              <div class="badge" style="margin-bottom:8px;">Original</div>
+              <canvas id="srcCanvas"></canvas>
+            </div>
+            <div class="checker" style="padding:6px;">
+              <div class="badge" style="margin:0 0 8px 4px;">Transparent result</div>
+              <canvas id="outCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:24px;">
+      <h2>How it works</h2>
+      <p>This tool removes pixels near a chosen background color using a tolerance threshold. Auto mode samples image
+        corners to estimate the background; eyedropper lets you click a specific color; manual lets you pick a color
+        swatch. Feathering softens edges for cleaner cutouts.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="credits">© <span id="year"></span> Ralph's Remove BG — Crafted with white, gold, purple, black, and
+        blue.</div>
+      <div>Built for quick, local background removal in your browser. No uploads, no tracking.</div>
+      <nav>
+        <!-- Link to usage guide -->
+        <a href="how-to-use.html" style="color:gold; margin-right:15px;">How to Use</a>
+        <!-- Link to fictional background page -->
+        <a href="about-ralph.html" style="color:purple;">About the Creator & Other Products</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    const fileInput = document.getElementById('file');
+    const pickBtn = document.getElementById('pickBtn');
+    const drop = document.getElementById('drop');
+
+    const srcCanvas = document.getElementById('srcCanvas');
+    const outCanvas = document.getElementById('outCanvas');
+    const srcCtx = srcCanvas.getContext('2d');
+    const outCtx = outCanvas.getContext('2d');
+
+    const tol = document.getElementById('tol');
+    const tolVal = document.getElementById('tolVal');
+    const feather = document.getElementById('feather');
+    const featherVal = document.getElementById('featherVal');
+    const processBtn = document.getElementById('processBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const invertBtn = document.getElementById('invertBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const sampleBtn = document.getElementById('sampleBtn');
+    const colorPick = document.getElementById('colorPick');
+
+    const yearEl = document.getElementById('year');
+    yearEl.textContent = new Date().getFullYear();
+
+    let imageBitmap = null;
+    let imgNatural = { w: 0, h: 0 };
+    let targetColor = { r: 255, g: 255, b: 255 };
+    let mode = 'auto';
+    let inverted = false;
+
+    function setModeFromUI() {
+      const selected = document.querySelector('input[name="mode"]:checked');
+      mode = selected ? selected.value : 'auto';
+    }
+    document.querySelectorAll('input[name="mode"]').forEach(r => {
+      r.addEventListener('change', setModeFromUI);
+    });
+
+    tol.addEventListener('input', () => { tolVal.textContent = tol.value; });
+    feather.addEventListener('input', () => { featherVal.textContent = `${feather.value} px`; });
+
+    pickBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      await loadImageFile(file);
+    });
+
+    // Drag & drop
+    ['dragenter', 'dragover'].forEach(evt => {
+      drop.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); drop.classList.add('drag'); });
+    });
+    ['dragleave', 'drop'].forEach(evt => {
+      drop.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); drop.classList.remove('drag'); });
+    });
+    drop.addEventListener('drop', async (e) => {
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (!file) return;
+      await loadImageFile(file);
+    });
+
+    // Canvas click for eyedropper
+    srcCanvas.addEventListener('click', (e) => {
+      if (mode !== 'eyedrop' || !imageBitmap) return;
+      const rect = srcCanvas.getBoundingClientRect();
+      const x = Math.floor((e.clientX - rect.left) * (srcCanvas.width / rect.width));
+      const y = Math.floor((e.clientY - rect.top) * (srcCanvas.height / rect.height));
+      const imgData = srcCtx.getImageData(0, 0, srcCanvas.width, srcCanvas.height);
+      const idx = (y * imgData.width + x) * 4;
+      targetColor = { r: imgData.data[idx], g: imgData.data[idx + 1], b: imgData.data[idx + 2] };
+      colorPick.value = rgbToHex(targetColor.r, targetColor.g, targetColor.b);
+      flashBadge(`Sampled: #${colorPick.value.slice(1).toUpperCase()}`);
+    });
+
+    sampleBtn.addEventListener('click', () => {
+      if (!imageBitmap) return;
+      targetColor = autoSampleColor(srcCtx, srcCanvas.width, srcCanvas.height);
+      colorPick.value = rgbToHex(targetColor.r, targetColor.g, targetColor.b);
+      flashBadge(`Auto sampled: #${colorPick.value.slice(1).toUpperCase()}`);
+    });
+
+    colorPick.addEventListener('input', () => {
+      if (mode === 'color') {
+        const { r, g, b } = hexToRgb(colorPick.value);
+        targetColor = { r, g, b };
+      }
+    });
+
+    invertBtn.addEventListener('click', () => {
+      inverted = !inverted;
+      invertBtn.textContent = inverted ? 'Invert selection (On)' : 'Invert selection';
+      if (imageBitmap) processImage();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      tol.value = 40; tolVal.textContent = '40';
+      feather.value = 2; featherVal.textContent = '2 px';
+      inverted = false; invertBtn.textContent = 'Invert selection';
+      setModeFromUI();
+      if (imageBitmap) {
+        drawSource();
+        outCtx.clearRect(0, 0, outCanvas.width, outCanvas.height);
+        downloadBtn.disabled = true;
+      }
+    });
+
+    processBtn.addEventListener('click', () => {
+      if (!imageBitmap) return;
+      setModeFromUI();
+      if (mode === 'auto') {
+        targetColor = autoSampleColor(srcCtx, srcCanvas.width, srcCanvas.height);
+        colorPick.value = rgbToHex(targetColor.r, targetColor.g, targetColor.b);
+      } else if (mode === 'color') {
+        const { r, g, b } = hexToRgb(colorPick.value);
+        targetColor = { r, g, b };
+      }
+      processImage();
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (!outCanvas.width || !outCanvas.height) return;
+      const a = document.createElement('a');
+      a.href = outCanvas.toDataURL('image/png');
+      a.download = 'ralph-remove-bg.png';
+      a.click();
+    });
+
+    async function loadImageFile(file) {
+      const blobURL = URL.createObjectURL(file);
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = async () => {
+        imageBitmap = await createImageBitmap(img);
+        imgNatural = { w: imageBitmap.width, h: imageBitmap.height };
+        fitCanvasToImage();
+        drawSource();
+        outCtx.clearRect(0, 0, outCanvas.width, outCanvas.height);
+        downloadBtn.disabled = true;
+        URL.revokeObjectURL(blobURL);
+      };
+      img.onerror = () => {
+        alert('Could not load that image. Try a different file.');
+        URL.revokeObjectURL(blobURL);
+      };
+      img.src = blobURL;
+    }
+
+    function fitCanvasToImage() {
+      const maxW = Math.min(900, imgNatural.w);
+      const scale = maxW / imgNatural.w;
+      const w = Math.round(imgNatural.w * scale);
+      const h = Math.round(imgNatural.h * scale);
+      srcCanvas.width = w; srcCanvas.height = h;
+      outCanvas.width = w; outCanvas.height = h;
+    }
+
+    function drawSource() {
+      srcCtx.clearRect(0, 0, srcCanvas.width, srcCanvas.height);
+      srcCtx.drawImage(imageBitmap, 0, 0, srcCanvas.width, srcCanvas.height);
+    }
+
+    function processImage() {
+      drawSource();
+      const src = srcCtx.getImageData(0, 0, srcCanvas.width, srcCanvas.height);
+      const out = outCtx.createImageData(src.width, src.height);
+      const t = parseInt(tol.value, 10);
+      const f = parseInt(feather.value, 10);
+
+      // Pass 1: remove background by color distance
+      for (let i = 0; i < src.data.length; i += 4) {
+        const r = src.data[i], g = src.data[i + 1], b = src.data[i + 2], a = src.data[i + 3];
+        const dist = colorDistance(r, g, b, targetColor.r, targetColor.g, targetColor.b);
+        const remove = inverted ? dist > t : dist <= t;
+        out.data[i] = src.data[i];
+        out.data[i + 1] = src.data[i + 1];
+        out.data[i + 2] = src.data[i + 2];
+        out.data[i + 3] = remove ? 0 : a;
+      }
+
+      // Optional feathering: blur alpha channel slightly
+      if (f > 0) {
+        featherAlpha(out, src.width, src.height, f);
+      }
+
+      outCtx.putImageData(out, 0, 0);
+      downloadBtn.disabled = false;
+    }
+
+    function colorDistance(r1, g1, b1, r2, g2, b2) {
+      // Simple Euclidean distance in RGB
+      const dr = r1 - r2, dg = g1 - g2, db = b1 - b2;
+      return Math.sqrt(dr * dr + dg * dg + db * db);
+    }
+
+    function featherAlpha(imgData, w, h, radius) {
+      // Box blur alpha channel
+      const alpha = new Uint8ClampedArray(w * h);
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          alpha[y * w + x] = imgData.data[(y * w + x) * 4 + 3];
+        }
+      }
+      const tmp = new Uint8ClampedArray(alpha.length);
+
+      // Horizontal blur
+      for (let y = 0; y < h; y++) {
+        let sum = 0;
+        for (let x = 0; x < w; x++) {
+          const left = x - radius - 1;
+          const right = x + radius;
+          if (left >= 0) sum -= alpha[y * w + left];
+          if (right < w) sum += alpha[y * w + right];
+          const kernelSize = Math.min(w - 1, x + radius) - Math.max(0, x - radius) + 1;
+          tmp[y * w + x] = sum / Math.max(1, kernelSize);
+        }
+      }
+      // Vertical blur
+      for (let x = 0; x < w; x++) {
+        let sum = 0;
+        for (let y = 0; y < h; y++) {
+          const top = y - radius - 1;
+          const bottom = y + radius;
+          if (top >= 0) sum -= tmp[top * w + x];
+          if (bottom < h) sum += tmp[bottom * w + x];
+          const kernelSize = Math.min(h - 1, y + radius) - Math.max(0, y - radius) + 1;
+          const idx = (y * w + x) * 4 + 3;
+          imgData.data[idx] = sum / Math.max(1, kernelSize);
+        }
+      }
+    }
+
+    function autoSampleColor(ctx, w, h) {
+      const samplePoints = [
+        { x: 2, y: 2 },
+        { x: w - 3, y: 2 },
+        { x: 2, y: h - 3 },
+        { x: w - 3, y: h - 3 },
+        { x: Math.round(w / 2), y: 2 },
+        { x: Math.round(w / 2), y: h - 3 },
+      ];
+      const img = ctx.getImageData(0, 0, w, h);
+      let r = 0, g = 0, b = 0;
+      samplePoints.forEach(p => {
+        const idx = (p.y * w + p.x) * 4;
+        r += img.data[idx];
+        g += img.data[idx + 1];
+        b += img.data[idx + 2];
+      });
+      const n = samplePoints.length;
+      return { r: Math.round(r / n), g: Math.round(g / n), b: Math.round(b / n) };
+    }
+
+    function hexToRgb(hex) {
+      const h = hex.replace('#', '');
+      const bigint = parseInt(h, 16);
+      return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 };
+    }
+    function rgbToHex(r, g, b) {
+      return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+    }
+
+    function flashBadge(text) {
+      const badge = document.createElement('div');
+      badge.className = 'badge';
+      badge.textContent = text;
+      badge.style.position = 'fixed';
+      badge.style.bottom = '18px';
+      badge.style.right = '18px';
+      badge.style.zIndex = '99';
+      badge.style.boxShadow = '0 10px 22px rgba(106,13,173,0.35)';
+      document.body.appendChild(badge);
+      setTimeout(() => { badge.remove(); }, 1800);
+    }
+  </script>
+</body>
+
+</html>
